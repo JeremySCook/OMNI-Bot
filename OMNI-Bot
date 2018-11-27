@@ -1,0 +1,147 @@
+//Code to control OMNI-robot
+//by Jeremy S. Cook
+//Still may need some refinement, but happy with the structure so far.
+
+#include <AccelStepper.h>
+
+AccelStepper stepperA(AccelStepper::DRIVER, 3, 2); //defines 3 as the step pin, 2 as direction
+AccelStepper stepperB(AccelStepper::DRIVER, 5, 4); 
+AccelStepper stepperC(AccelStepper::DRIVER, 7, 6);
+AccelStepper stepperD(AccelStepper::DRIVER, 9, 8);
+
+char userInput;
+int cwSpeed = 500;
+int ccwSpeed = -500;
+
+void setup() {
+  stepperA.setMaxSpeed(3000);
+  stepperA.setAcceleration(1000);
+  stepperB.setMaxSpeed(3000);
+  stepperB.setAcceleration(1000);
+  stepperC.setMaxSpeed(3000);
+  stepperC.setAcceleration(1000);
+  stepperD.setMaxSpeed(3000);
+  stepperD.setAcceleration(1000);  
+
+  Serial.begin(9600);
+  Serial.println("Omni-Bot Control Begin");
+  Serial.println("enter: f, b, r, l, c, a, s");
+}
+
+void loop() {
+  userInput = Serial.read(); //read serial input
+  if(userInput =='f') fwd();
+  else if(userInput =='b') bkw();
+  else if(userInput =='r') rt();
+  else if(userInput =='l') lt();
+  else if(userInput =='c') cw();
+  else if(userInput =='a') ccw();
+  else if(userInput =='s') stp();
+  stepperA.runSpeed();
+  stepperB.runSpeed();
+  stepperC.runSpeed();
+  stepperD.runSpeed();
+}
+
+//HIGH LEVEL MOTOR FUNCTIONS (fwd, bkw, rt, lt, cw, ccw)
+
+void fwd(){
+  Serial.println("Bot moving forward");
+  accwMotor();
+  ccwMotor();
+  bstopMotor();
+  dstopMotor();
+}
+void bkw(){
+  Serial.println("Bot moving backwards");
+  acwMotor();
+  cccwMotor();
+  bstopMotor();
+  dstopMotor();
+}
+void rt(){
+  Serial.println("Bot moving right");
+  bccwMotor();
+  dcwMotor();
+  astopMotor();
+  cstopMotor();
+}
+void lt(){
+  Serial.println("Bot moving left");
+  bcwMotor();
+  dccwMotor();
+  astopMotor();
+  cstopMotor();
+}
+void cw() {
+  Serial.println("Bot moving clockwise");
+  acwMotor();
+  bcwMotor();
+  ccwMotor();
+  dcwMotor();
+}
+void ccw() {
+  Serial.println("Bot moving counter-clockwise");
+  accwMotor();
+  bccwMotor();
+  cccwMotor();
+  dccwMotor();
+}
+void stp() {
+  Serial.println("Bot stop");
+  astopMotor();
+  bstopMotor();
+  cstopMotor();
+  dstopMotor();
+}
+
+//LOW LEVEL MOTOR FUNCTIONS
+
+void acwMotor(){
+  Serial.println("Motor A clockwise");
+  stepperA.setSpeed(cwSpeed);
+}
+void accwMotor(){
+  Serial.println("Motor A counter-clockwise");
+  stepperA.setSpeed(ccwSpeed);
+}
+void bcwMotor(){
+  Serial.println("Motor B clockwise");
+  stepperB.setSpeed(cwSpeed);
+}
+void bccwMotor(){
+  Serial.println("Motor B counter-clockwise");
+  stepperB.setSpeed(ccwSpeed);
+}
+void ccwMotor(){
+  Serial.println("Motor C clockwise");
+  stepperC.setSpeed(cwSpeed);
+}
+void cccwMotor(){
+  Serial.println("Motor C counter-clockwise");
+  stepperC.setSpeed(ccwSpeed);
+}
+void dcwMotor(){
+  Serial.println("Motor D clockwise");
+  stepperD.setSpeed(cwSpeed);
+}
+void dccwMotor(){
+  Serial.println("Motor D counter-clockwise");
+  stepperD.setSpeed(ccwSpeed);
+}
+void astopMotor(){
+  Serial.println("Motor A stop");
+  stepperA.setSpeed(0);
+}
+void bstopMotor(){
+  Serial.println("Motor A stop");
+  stepperB.setSpeed(0);
+}
+void cstopMotor(){
+  Serial.println("Motor A stop");
+  stepperC.setSpeed(0);
+}
+void dstopMotor(){
+  Serial.println("Motor A stop");
+  stepperD.setSpeed(0);
+}
