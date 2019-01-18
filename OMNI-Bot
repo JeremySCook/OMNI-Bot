@@ -1,7 +1,3 @@
-//Code to control OMNI-robot
-//by Jeremy S. Cook
-//Still may need some refinement, but happy with the structure so far.
-
 #include <AccelStepper.h>
 
 AccelStepper stepperA(AccelStepper::DRIVER, 3, 2); //defines 3 as the step pin, 2 as direction
@@ -12,6 +8,9 @@ AccelStepper stepperD(AccelStepper::DRIVER, 9, 8);
 char userInput;
 int cwSpeed = 500;
 int ccwSpeed = -500;
+int speedIn = 100;
+int batLevel = 95; //battery level times 10
+
 
 void setup() {
   stepperA.setMaxSpeed(3000);
@@ -26,10 +25,35 @@ void setup() {
   Serial.begin(9600);
   Serial.println("Omni-Bot Control Begin");
   Serial.println("enter: f, b, r, l, c, a, s");
+  pinMode(10, OUTPUT); //LED pin
+  pinMode(11, OUTPUT); //LED pin
 }
 
 void loop() {
   userInput = Serial.read(); //read serial input
+  int speedPot = analogRead(A0);
+  int batIn = analogRead(A1);
+  speedIn = map(speedPot, 0, 750, 0, 1000);
+  cwSpeed = speedIn;
+  ccwSpeed = -speedIn;
+//  Serial.print("cwSpeed ");
+//  Serial.println(cwSpeed);
+//  Serial.print("ccwSpeed ");
+//  Serial.println(ccwSpeed);
+  
+//=============battery monitor=======================
+  batLevel = map(batIn, 0, 1023, 0, 250); //maps analog input based on .2 voltage divider
+  if(batLevel > 94) {
+  digitalWrite(10, HIGH);
+  digitalWrite(11, HIGH);
+  }
+  else if(batLevel < 95) {
+  digitalWrite(10, LOW);
+  digitalWrite(11, LOW);
+  }
+//   Serial.print("batLevel ");
+//   Serial.println(batLevel);
+//===================================================
   if(userInput =='f') fwd();
   else if(userInput =='b') bkw();
   else if(userInput =='r') rt();
@@ -47,31 +71,31 @@ void loop() {
 
 void fwd(){
   Serial.println("Bot moving forward");
-  accwMotor();
-  ccwMotor();
+  acwMotor();
   bstopMotor();
+  cccwMotor();
   dstopMotor();
 }
 void bkw(){
   Serial.println("Bot moving backwards");
-  acwMotor();
-  cccwMotor();
+  accwMotor();
   bstopMotor();
+  ccwMotor();
   dstopMotor();
 }
 void rt(){
   Serial.println("Bot moving right");
-  bccwMotor();
-  dcwMotor();
   astopMotor();
+  bccwMotor();
   cstopMotor();
+  dcwMotor();
 }
 void lt(){
   Serial.println("Bot moving left");
-  bcwMotor();
-  dccwMotor();
   astopMotor();
+  bcwMotor();
   cstopMotor();
+  dccwMotor();
 }
 void cw() {
   Serial.println("Bot moving clockwise");
